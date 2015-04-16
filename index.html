@@ -1,0 +1,159 @@
+﻿<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>Dein Name verrät</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, minimal-ui"/>
+    <style>
+      html, body
+      {
+        margin: 0px;
+        padding: 0px;
+        height: 100%;
+        overflow: hidden;
+      }
+      body {
+      }
+      
+      #hlDownload, #hlDownload:visited {
+	    cursor:pointer;
+	    color:#000;
+	}
+	#btnSetText, #hlDownload
+	{
+	    border: solid 1px silver;
+	    padding: 2px 10px 2px 10px;
+	    background: lightgrey;
+	}
+	div, textarea, input, select, h3
+	{
+	    font-family: Verdana;
+	}
+	textarea, input, select, a#hlDownload, label
+	{
+	    font-size: larger;
+	}
+	textarea { vertical-align: top;}
+	div#container
+	{
+       position: absolute;
+       top: 10%;
+       /*margin-top: -200px;/* half of #content height*/
+       left: 0;
+       width: 100%;
+    }
+    div#content {
+       width: 800px;
+       margin-left: auto;
+       margin-right: auto;
+       height: 420px;
+       background: #EAC155;
+    }
+    label 
+    {
+        width: 250px;
+        display: inline-block;
+        
+    }
+    
+    </style>
+    <script type="text/javascript" src="jquery-1.11.0.min.js"></script>
+    <script type="text/javascript">
+    // http://www.html5canvastutorials.com/tutorials/html5-canvas-element/
+
+    var context;
+    var imageObj;
+
+     function createImage(name, desc) {
+         var canvas = document.getElementById('cnvStamp');
+         context = canvas.getContext('2d');
+
+         context.clearRect(0, 0, canvas.width, canvas.height);
+
+         // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
+         var data = '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="420">' +
+           '<foreignObject width="100%" height="100%">' +
+           '<div xmlns="http://www.w3.org/1999/xhtml" style="height: 420px; font-size:40px; font-family: Helvetiva, Arial; background: #EAC155;">' +
+             '<div style="text-align: center; height: 85px; padding-top: 20px">' + 
+                '<span style="background: white; border-radius: 10px; padding: 10px 40px 10px 40px; font-size: 46px; font-weight: bold">' + name + '</span></div>' +
+             '<div style="margin: 0px 20px 0px 20px; font-size: 34px; font-weight: bolder; line-height: 1.2em">Dein Name verrät: ' + 
+             desc.replace(/\n/g, "<br />") + '</div>' +
+           '</div>' +
+           '</foreignObject>' +
+           '</svg>';
+
+         var DOMURL = window.URL || window.webkitURL || window;
+
+         var img = new Image();
+         var svg = new Blob([data], { type: 'image/svg+xml;charset=utf-8' });
+         var url = DOMURL.createObjectURL(svg);
+
+         img.onload = function () {
+             context.drawImage(img, 0, 0);
+             DOMURL.revokeObjectURL(url);
+         }
+
+         img.src = url;
+         // end of https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Drawing_DOM_objects_into_a_canvas
+     }
+
+     $(function () {
+
+         createImage("Dummy User", "Du bist einfach der Größte! Du bist so super, und nicht nur einfach so, nein, du bist überhaupt und uneingeschränkt einfach UN PACK BAR.");
+
+         $("#btnSetText").click(function () {
+             createImage($("#edName").val().trim(), $("#edPhrase").val().trim());
+         });
+
+         // http://jsfiddle.net/AbdiasSoftware/7PRNN/
+         /**
+         * This is the function that will take care of image extracting and
+         * setting proper filename for the download.
+         * IMPORTANT: Call it from within a onclick event.
+         */
+         function downloadCanvas(link, canvasId, filename) {
+             link.href = document.getElementById(canvasId).toDataURL();
+             link.download = filename;
+         }
+
+         /** 
+         * The event handler for the link's onclick event. We give THIS as a
+         * parameter (=the link element), ID of the canvas and a filename.
+         */
+         document.getElementById('hlDownload').addEventListener('click', function () {
+             downloadCanvas(this, 'cnvStamp', "DNV " + $("#edName").val().trim() + '.png');
+         }, false);
+
+         setTimeout(function () {
+             $("#btnSetText").trigger("click");
+         }, 1000);
+     });
+    </script>
+  </head>
+  <body>
+    <h3 style="text-align: center">Dein Name verrät</h3>
+    <div id="container">
+        <div id="content">
+            <canvas id="cnvStamp" width="800" height="420" style="background-color: #EAC155">
+            </canvas>
+            <div>        
+                <label for="edName">Name</label>
+                <input id="edName" type="text" maxlength="60" value="Dummy User" />
+            </div>
+            <div style="vertical-align: text-top">       
+                <label for="edPhrase">Was dieser Name verraten soll</label>
+                <textarea id="edPhrase"  rows="6" cols="40">Du bist einfach der Größte! Du bist so super, und nicht nur einfach so, nein, du bist überhaupt und uneingeschränkt einfach UN PACK BAR.</textarea>
+            </div>
+            <div style="margin-top: 4px">
+                <label></label>
+                <input type="button" value=" Erstellen " id="btnSetText" />
+                <a id="hlDownload"> Herunterladen </a>
+            </div>
+        </div>
+    </div>
+    <div style="position: absolute; bottom: 40px; text-align: center; width: 100%; font-size: smaller">
+        Das Herunterladen wird derzeit nur von Firefox unterstützt.
+        <br />
+        Inspiration: <a href="http://de.nametests.com/" target="_blank">Welche wahre Bedeutung verbirgt sich hinter deinem Namen</a> going viral April 2015.
+    </div>
+  </body>
+</html>      
